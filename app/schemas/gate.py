@@ -1,5 +1,4 @@
-from pydantic import BaseModel, Field
-from typing import List
+from pydantic import BaseModel
 
 
 class GateResponse(BaseModel):
@@ -20,7 +19,7 @@ class ConnectionResponse(BaseModel):
 class GateDetailResponse(BaseModel):
     gate_id: str
     gate_name: str
-    connections: List[ConnectionResponse]
+    connections: list[ConnectionResponse]
 
     class Config:
         from_attributes = True
@@ -37,4 +36,4 @@ class RouteResponse(BaseModel):
     end_gate_id: str
     total_distance_hu: float
     total_cost: float
-    path: List[RouteSegment]
+    path: list[RouteSegment]

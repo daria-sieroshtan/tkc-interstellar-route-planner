@@ -31,10 +31,27 @@ Pre-requisite: poetry installed
 poetry install
 ```
 
-### Run tests
+### Development Commands
+
+Use the Makefile for convenience:
+
+```bash
+make install       # Install dependencies
+make test          # Run tests
+make format        # Format code with Ruff
+make lint          # Lint code with Ruff
+make type-check    # Type check with mypy
+make check-all     # Run all checks (CI pipeline)
+make fix           # Auto-fix linting issues
+make clean         # Clean cache files
+```
+
+Or use Poetry directly:
 
 ```bash
 poetry run pytest              # Run all tests
 poetry run pytest -v           # Verbose output
-poetry shell                   # Activate venv, then just use: pytest
+poetry run ruff format app     # Format code
+poetry run ruff check app      # Lint code
+poetry run mypy app            # Type check
 ```

@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import transport, gates
+
+from app.api.v1.endpoints import gates, transport
 
 api_router = APIRouter()
 

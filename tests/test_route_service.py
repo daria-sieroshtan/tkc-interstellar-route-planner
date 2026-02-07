@@ -1,8 +1,10 @@
-import pytest
 from unittest.mock import AsyncMock
-from app.services.route_service import RouteService
+
+import pytest
+
 from app.repositories.gate_repository import GateRepository
 from app.schemas.gate import RouteSegment
+from app.services.route_service import RouteService
 
 
 @pytest.fixture

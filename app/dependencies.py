@@ -1,5 +1,6 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.db import get_db
 from app.repositories.gate_repository import GateRepository
 from app.services.route_service import RouteService
