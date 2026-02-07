@@ -1,6 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from app.schemas.gate import GateResponse, GateDetailResponse, RouteResponse
+from app.repositories.gate_repository import GateRepository
+from app.dependencies import get_gate_repository
 
 router = APIRouter()
 
@@ -12,9 +14,16 @@ async def list_gates():
 
 
 @router.get("/{gate_code}", response_model=GateDetailResponse)
-async def get_gate(gate_code: str):
-    # TODO: Implement database query to fetch specific gate
-    raise HTTPException(status_code=404, detail=f"Gate {gate_code} not found")
+async def get_gate(
+    gate_code: str,
+    repository: GateRepository = Depends(get_gate_repository)
+):
+    gate = await repository.get_gate_with_connections(gate_code)
+
+    if not gate:
+        raise HTTPException(status_code=404, detail=f"Gate {gate_code} not found")
+
+    return gate
 
 
 @router.get("/{gate_code}/to/{target_gate_code}", response_model=RouteResponse)
