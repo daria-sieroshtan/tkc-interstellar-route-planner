@@ -4,6 +4,7 @@ __pycache__/
 
 .env
 
-# Virtual Environment
 venv/
 env/
+
+alembic/versions/__pycache__/
