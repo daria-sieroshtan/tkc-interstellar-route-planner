@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "interstellar-route-planner"
+version = "0.1.0"
+description = "API service for calculating interstellar journey costs through the HSTC hyperspace gate network"
+authors = ["Daria"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "0.115.0"
+uvicorn = {extras = ["standard"], version = "0.32.0"}
+pydantic = "2.9.2"
+pydantic-settings = "2.5.2"
+asyncpg = "0.29.0"
+sqlalchemy = "2.0.35"
+alembic = "1.13.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "8.0.0"
+pytest-asyncio = "0.23.5"
+pytest-mock = "3.12.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers"
+]
+markers = [
+    "asyncio: mark test as async"
+]
