@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from app.schemas.gate import GateResponse, GateDetailResponse, RouteResponse
 from app.repositories.gate_repository import GateRepository
-from app.dependencies import get_gate_repository
+from app.services.route_service import RouteService
+from app.dependencies import get_gate_repository, get_route_service
 
 router = APIRouter()
 
@@ -26,9 +27,17 @@ async def get_gate(
 
 
 @router.get("/{gate_code}/to/{target_gate_code}", response_model=RouteResponse)
-async def calculate_route(gate_code: str, target_gate_code: str):
-    # TODO: Implement Dijkstra's algorithm
-    raise HTTPException(
-        status_code=404,
-        detail=f"No route found from {gate_code} to {target_gate_code}"
-    )
+async def calculate_route(
+    gate_code: str,
+    target_gate_code: str,
+    service: RouteService = Depends(get_route_service)
+):
+    route = await service.calculate_cheapest_route(gate_code, target_gate_code)
+
+    if not route:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No route found from {gate_code} to {target_gate_code}"
+        )
+
+    return route

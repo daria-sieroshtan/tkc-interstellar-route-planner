@@ -2,7 +2,7 @@
 
 API service for calculating interstellar journey costs through the HSTC (Hyperspace Tunneling Corp) hyperspace gate network.
 
-## Quick Start
+## Running the application locally
 
 Pre-requisite: docker compose installed.
 
@@ -18,8 +18,20 @@ Check the logs for any troubleshooting
 docker compose logs -f api
 ```
 
-Access the API:
+### Access the API:
 - API: http://localhost:8000
 - Interactive docs: http://localhost:8000/docs
 - Database: localhost:5432
 
+### Run tests
+```bash
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run tests
+pytest
+```

@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional, List
 from app.models import Gate, Connection
-from app.schemas.gate import GateDetailResponse, ConnectionResponse, GateResponse
+from app.schemas.gate import GateDetailResponse, ConnectionResponse, GateResponse, RouteSegment
 
 
 class GateRepository:
@@ -13,6 +13,12 @@ class GateRepository:
         result = await self.session.execute(select(Gate))
         gates = result.scalars().all()
         return [GateResponse.model_validate(gate) for gate in gates]
+
+    async def gate_exists(self, gate_id: str) -> bool:
+        result = await self.session.execute(
+            select(Gate).where(Gate.gate_id == gate_id.upper())
+        )
+        return result.scalar_one_or_none() is not None
 
     async def get_gate_with_connections(self, gate_id: str) -> Optional[GateDetailResponse]:
         result = await self.session.execute(
@@ -43,3 +49,15 @@ class GateRepository:
             gate_name=gate.gate_name,
             connections=connections
         )
+
+    async def get_all_connections(self) -> List[RouteSegment]:
+        result = await self.session.execute(select(Connection))
+        connections = result.scalars().all()
+        return [
+            RouteSegment(
+                from_gate_id=conn.from_gate_id,
+                to_gate_id=conn.to_gate_id,
+                distance_hu=conn.distance_hu
+            )
+            for conn in connections
+        ]
