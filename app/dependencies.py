@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_db
 from app.repositories.gate_repository import GateRepository
 from app.services.route_service import RouteService
+from app.services.transport_service import TransportService
 
 
 def get_gate_repository(session: AsyncSession = Depends(get_db)) -> GateRepository:
@@ -12,3 +13,7 @@ def get_gate_repository(session: AsyncSession = Depends(get_db)) -> GateReposito
 
 def get_route_service(repository: GateRepository = Depends(get_gate_repository)) -> RouteService:
     return RouteService(repository)
+
+
+def get_transport_service() -> TransportService:
+    return TransportService()
