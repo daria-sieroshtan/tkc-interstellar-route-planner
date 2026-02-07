@@ -8,9 +8,8 @@ router = APIRouter()
 
 
 @router.get("", response_model=List[GateResponse])
-async def list_gates():
-    # TODO: Implement database query to fetch all gates
-    return []
+async def list_gates(repository: GateRepository = Depends(get_gate_repository)):
+    return await repository.get_all_gates()
 
 
 @router.get("/{gate_code}", response_model=GateDetailResponse)

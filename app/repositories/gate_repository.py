@@ -1,13 +1,18 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from typing import Optional
+from typing import Optional, List
 from app.models import Gate, Connection
-from app.schemas.gate import GateDetailResponse, ConnectionResponse
+from app.schemas.gate import GateDetailResponse, ConnectionResponse, GateResponse
 
 
 class GateRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def get_all_gates(self) -> List[GateResponse]:
+        result = await self.session.execute(select(Gate))
+        gates = result.scalars().all()
+        return [GateResponse.model_validate(gate) for gate in gates]
 
     async def get_gate_with_connections(self, gate_id: str) -> Optional[GateDetailResponse]:
         result = await self.session.execute(
