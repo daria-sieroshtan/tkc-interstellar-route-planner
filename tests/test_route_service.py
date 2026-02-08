@@ -83,18 +83,25 @@ async def test_direct_connection_route(route_service, mock_repository, all_gate_
     assert result is not None
     assert result.start_gate_id == "SOL"
     assert result.end_gate_id == "PRX"
-    assert result.total_distance_hu == 90.0
-    assert result.total_cost == 90.0 * 0.10
-    assert len(result.path) == 1
+    assert result.total_distance_hu == 180.0
+    assert result.total_cost == 18.0
+    assert len(result.path) == 2
+
     assert result.path[0].from_gate_id == "SOL"
     assert result.path[0].to_gate_id == "PRX"
     assert result.path[0].distance_hu == 90.0
 
+    assert result.path[1].from_gate_id == "PRX"
+    assert result.path[1].to_gate_id == "SOL"
+    assert result.path[1].distance_hu == 90.0
+
 
 @pytest.mark.asyncio
 async def test_multi_hop_route_finds_shortest_path(route_service, mock_repository, all_gate_connections):
-    # Route: SOL -> ALS
-    # Expected path: SOL -> ARC -> DEN -> FOM -> ALS (337 HU)
+    # Round trip: SOL -> ALS -> SOL
+    # Outbound: SOL -> ARC -> DEN -> FOM -> ALS (337 HU)
+    # Inbound: ALS -> ALD -> SOL (201 HU)
+    # Total: 538 HU
 
     # Arrange
     mock_repository.gate_exists.side_effect = lambda gate_id: gate_id in ["SOL", "ALS"]
@@ -107,10 +114,11 @@ async def test_multi_hop_route_finds_shortest_path(route_service, mock_repositor
     assert result is not None
     assert result.start_gate_id == "SOL"
     assert result.end_gate_id == "ALS"
-    assert result.total_distance_hu == 337.0
-    assert result.total_cost == 33.7
-    assert len(result.path) == 4
+    assert result.total_distance_hu == 538.0
+    assert result.total_cost == pytest.approx(53.8)
+    assert len(result.path) == 6
 
+    # Outbound path
     assert result.path[0].from_gate_id == "SOL"
     assert result.path[0].to_gate_id == "ARC"
     assert result.path[0].distance_hu == 200.0
@@ -127,6 +135,15 @@ async def test_multi_hop_route_finds_shortest_path(route_service, mock_repositor
     assert result.path[3].to_gate_id == "ALS"
     assert result.path[3].distance_hu == 9.0
 
+    # Inbound path
+    assert result.path[4].from_gate_id == "ALS"
+    assert result.path[4].to_gate_id == "ALD"
+    assert result.path[4].distance_hu == 1.0
+
+    assert result.path[5].from_gate_id == "ALD"
+    assert result.path[5].to_gate_id == "SOL"
+    assert result.path[5].distance_hu == 200.0
+
 
 @pytest.mark.asyncio
 async def test_case_insensitive_gate_codes(route_service, mock_repository, all_gate_connections):
@@ -141,7 +158,7 @@ async def test_case_insensitive_gate_codes(route_service, mock_repository, all_g
     assert result is not None
     assert result.start_gate_id == "SOL"
     assert result.end_gate_id == "PRX"
-    assert result.total_distance_hu == 90.0
+    assert result.total_distance_hu == 180.0
 
 
 @pytest.mark.asyncio
@@ -233,28 +250,6 @@ async def test_empty_connections_graph(route_service, mock_repository):
 
 
 @pytest.mark.asyncio
-async def test_asymmetric_connections(route_service, mock_repository):
-    # Arrange
-    asymmetric_connections = [
-        RouteSegment(from_gate_id="GATE_A", to_gate_id="GATE_B", distance_hu=10.0),
-        RouteSegment(from_gate_id="GATE_B", to_gate_id="GATE_A", distance_hu=20.0),
-    ]
-    mock_repository.gate_exists.return_value = True
-    mock_repository.get_all_connections.return_value = asymmetric_connections
-
-    # Act
-    result_forward = await route_service.calculate_cheapest_route("GATE_A", "GATE_B")
-    result_backward = await route_service.calculate_cheapest_route("GATE_B", "GATE_A")
-
-    # Assert
-    assert result_forward is not None
-    assert result_forward.total_distance_hu == 10.0
-
-    assert result_backward is not None
-    assert result_backward.total_distance_hu == 20.0
-
-
-@pytest.mark.asyncio
 async def test_one_way_connection_only(route_service, mock_repository):
     # Arrange
     one_way_connections = [
@@ -264,10 +259,7 @@ async def test_one_way_connection_only(route_service, mock_repository):
     mock_repository.get_all_connections.return_value = one_way_connections
 
     # Act
-    result_forward = await route_service.calculate_cheapest_route("GATE_A", "GATE_B")
-    result_backward = await route_service.calculate_cheapest_route("GATE_B", "GATE_A")
+    result = await route_service.calculate_cheapest_route("GATE_A", "GATE_B")
 
     # Assert
-    assert result_forward is not None
-    assert result_forward.total_distance_hu == 10.0
-    assert result_backward is None
+    assert result is None

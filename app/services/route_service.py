@@ -54,18 +54,17 @@ class RouteService:
         # Production optimization: cache the graph structure and route results to avoid
         # repeated DB queries and pathfinding calculations (not implemented for demo)
         all_connections = await self.gate_repository.get_all_connections()
-
         graph = self._build_graph(all_connections)
 
-        result = self._dijkstra(graph, start_gate_id, end_gate_id)
-
-        end_distance = result.get_distance(end_gate_id)
-        if end_distance is None or end_distance == float("inf"):
+        outbound = self._calculate_one_way_route(graph, start_gate_id, end_gate_id)
+        if not outbound:
             return None
 
-        path = self._reconstruct_path(result, start_gate_id, end_gate_id, graph)
+        inbound = self._calculate_one_way_route(graph, end_gate_id, start_gate_id)
+        if not inbound:
+            return None
 
-        total_distance_hu = end_distance
+        total_distance_hu = outbound.total_distance_hu + inbound.total_distance_hu
         total_cost = total_distance_hu * self.COST_PER_PASSENGER_PER_HU
 
         return RouteResponse(
@@ -73,6 +72,23 @@ class RouteService:
             end_gate_id=end_gate_id,
             total_distance_hu=total_distance_hu,
             total_cost=total_cost,
+            path=outbound.path + inbound.path,
+        )
+
+    def _calculate_one_way_route(self, graph: dict[str, list[Edge]], start: str, end: str) -> RouteResponse | None:
+        result = self._dijkstra(graph, start, end)
+
+        end_distance = result.get_distance(end)
+        if end_distance is None or end_distance == float("inf"):
+            return None
+
+        path = self._reconstruct_path(result, start, end, graph)
+
+        return RouteResponse(
+            start_gate_id=start,
+            end_gate_id=end,
+            total_distance_hu=end_distance,
+            total_cost=end_distance * self.COST_PER_PASSENGER_PER_HU,
             path=path,
         )
 
