@@ -25,15 +25,13 @@ API service for calculating interstellar journey costs through the HSTC (Hypersp
 Pre-requisite: docker compose installed.
 
 ```bash
-docker compose up --build -d
-# run DB migrations
-docker compose exec api alembic upgrade head
+docker compose -f ops/docker-compose.yml up --build -d
 ```
 
 Check the logs for any troubleshooting
 
 ```bash
-docker compose logs -f api
+docker compose -f ops/docker-compose.yml logs -f api
 ```
 
 ### Access the API:
