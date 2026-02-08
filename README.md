@@ -1,6 +1,24 @@
 # Interstellar Route Planner API
 
+Technical Challenge for [The Keyholding Company](https://github.com/TheKeyholdingCompany/tech-challenge-backend-dev)
+
 API service for calculating interstellar journey costs through the HSTC (Hyperspace Tunneling Corp) hyperspace gate network.
+
+## Implementation notes
+- Transport to the nearest gate cost calculation assumptions
+  - All passengers will use one way of transport (i.e. either all will go with the personal transport, or with HSTC, no group splitting)
+  - If costs are equal, personal transport is preferred
+  - We don't need to return the number of vehicles needed for the journey or any other additinal information
+- Hyperspace journey cost calculation
+  - Assumptions
+    - Calculation per 1 passenger
+    - Accept lowercase gate ids
+  - Dijkstra's shortest path algorithm is used
+  - In production some caching or DB query optimisations could be made, but they were not implemented in the scope of this demo
+
+### Not implemented due to the time boxing
+- E2E tests
+- Logging, observability
 
 ## Running the application locally
 
@@ -8,6 +26,7 @@ Pre-requisite: docker compose installed.
 
 ```bash
 docker compose up --build -d
+# run DB migrations
 docker compose exec api alembic upgrade head
 ```
 
