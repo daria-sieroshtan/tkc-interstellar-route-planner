@@ -9,3 +9,7 @@ venv/
 env/
 
 alembic/versions/__pycache__/
+
+ops/terraform/.terraform/
+ops/terraform/*.tfstate*
+ops/terraform/terraform.tfvars
