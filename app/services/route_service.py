@@ -51,8 +51,7 @@ class RouteService:
         if not start_exists or not end_exists:
             return None
 
-        # Production optimization: cache the graph structure and route results to avoid
-        # repeated DB queries and pathfinding calculations (not implemented for demo)
+        # Building adjacency list should be cached in production
         all_connections = await self.gate_repository.get_all_connections()
         graph = self._build_graph(all_connections)
 

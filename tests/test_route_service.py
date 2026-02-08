@@ -36,7 +36,7 @@ def all_gate_connections():
         RouteSegment(from_gate_id="SIR", to_gate_id="CAS", distance_hu=200.0),
         # CAS connections
         RouteSegment(from_gate_id="CAS", to_gate_id="SIR", distance_hu=200.0),
-        RouteSegment(from_gate_id="CAS", to_gate_id="PRO", distance_hu=80.0),
+        RouteSegment(from_gate_id="CAS", to_gate_id="PRO", distance_hu=120.0),
         # PRO connections
         RouteSegment(from_gate_id="PRO", to_gate_id="CAS", distance_hu=80.0),
         # DEN connections
